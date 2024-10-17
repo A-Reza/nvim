@@ -102,7 +102,7 @@ vim.g.have_nerd_font = true
 vim.opt.number = true
 -- You can also add relative line numbers, to help with jumping.
 --  Experiment for yourself to see if you like it!
--- vim.opt.relativenumber = true
+vim.opt.relativenumber = true
 
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.opt.mouse = 'v'
@@ -156,7 +156,8 @@ vim.opt.cursorline = true
 
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 10
-
+vim.opt.tabstop = 4
+vim.opt.shiftwidth = 4
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
 
@@ -947,7 +948,38 @@ require('lazy').setup({
     --    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
     --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
   },
+  {
+    'ThePrimeagen/harpoon',
+    branch = 'harpoon2',
+    dependencies = { 'nvim-lua/plenary.nvim' },
+    config = function()
+      local harpoon = require 'harpoon'
 
+      -- REQUIRED
+      harpoon:setup()
+      -- REQUIRED
+
+      vim.keymap.set('n', '<leader>ha', function()
+        harpoon:list():add()
+      end)
+      vim.keymap.set('n', '<leader>hv', function()
+        harpoon.ui:toggle_quick_menu(harpoon:list())
+      end)
+
+      for i = 1, 10, 1 do
+        vim.keymap.set('n', string.format('<leader>%d', i), function()
+          harpoon:list():select(i)
+        end)
+      end
+      -- Toggle previous & next buffers stored within Harpoon list
+      vim.keymap.set('n', '<leader>hN', function()
+        harpoon:list():prev()
+      end)
+      vim.keymap.set('n', '<leader>hn', function()
+        harpoon:list():next()
+      end)
+    end,
+  },
   -- The following two comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
   -- place them in the correct locations.
@@ -991,24 +1023,6 @@ require('lazy').setup({
     },
   },
 })
-
-vim.filetype.add {
-  extension = {
-    c3 = 'c3',
-    c3i = 'c3',
-    c3t = 'c3',
-  },
-}
-
-local parser_config = require('nvim-treesitter.parsers').get_parser_configs()
-parser_config.c3 = {
-  install_info = {
-    url = 'https://github.com/c3lang/tree-sitter-c3',
-    files = { 'src/parser.c', 'src/scanner.c' },
-    branch = 'main',
-  },
-  filetype = 'c3',
-}
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
